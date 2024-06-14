@@ -1,10 +1,14 @@
-const Joi = require('joi');
-const { user } = require('../models');
+const joi = require('joi');
+const { user, jobRequest } = require('../models');
 const jwt = require('jsonwebtoken');
 
-const updateProfileSchema = Joi.object({
-    description: Joi.string().min(15).max(80).required(),
-    image: Joi.string().required()
+const updateProfileSchema = joi.object({
+    image: joi.string().allow(null).allow('').optional(),
+    experience: joi.string().max(30).allow(null).allow('').optional(),
+    education: joi.string().allow(null).allow('').optional(),
+    languages: joi.array().items(joi.string().allow(null).allow('')).allow(null).optional(),
+    skills: joi.array().items(joi.string().allow(null).allow('')).max(5).allow(null).optional(),
+    description: joi.string().max(80).allow(null).allow('').optional()
 });
 
 
@@ -13,6 +17,10 @@ const getUser = async (req, res, next) => {
         const result = await user.findOne({
             where: {
                 id: req.params.id
+            },
+            include: {
+                model: jobRequest,
+                as: 'jobRequests'
             }
         })
 
@@ -35,10 +43,10 @@ const updateUser = async (req, res, next) => {
                 message: 'Token not found'
             })
         }
-
+        console.log(req.body.languages);
         const userData = jwt.decode(token);
-        console.log(userData);
-        const img = req.file.filename;
+
+        const img = req.file?.filename;
         const image = `uploads/${img}`;
 
         const updateData = {
@@ -46,7 +54,7 @@ const updateUser = async (req, res, next) => {
             image: image
         };
 
-        const { value: validatedData, error: dataError } = updateProfileSchema.validate(updateData);
+        const { value: validatedData, error: dataError } = updateProfileSchema.validate(img ? updateData : req.body);
 
         if (dataError) {
             return res.status(400).json({

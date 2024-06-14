@@ -2,13 +2,11 @@ const { jobRequest } = require('../models');
 const joi = require('joi');
 
 const jobRequestSchema = joi.object({
-    experience: joi.string().min(1).max(30).required(),
-    education: joi.string().min(1).required(),
-    languages: joi.array().items(joi.string()).min(1).required(),
-    skills: joi.array().items(joi.string()).min(1).max(5).required(),
-    reqDescription: joi.string().min(20).max(80).required(),
-    userId: joi.string().required(),
-    jobId: joi.string().required()
+    expectedSalary: joi.string().min(1).required(),
+    type: joi.string().required(),
+    note: joi.string().min(15).max(80).required(),
+    jobId: joi.string().required(),
+    userId: joi.string().required()
 });
 
 

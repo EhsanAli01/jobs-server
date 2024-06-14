@@ -28,37 +28,15 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.INTEGER
     },
-    experience: {
+    expectedSalary: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    education: {
+    type: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    languages: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        const value = this.getDataValue('languages');
-        return value ? JSON.parse(value) : [];
-      },
-      set(value) {
-        this.setDataValue('languages', JSON.stringify(value));
-      }
-    },
-    skills: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      get() {
-        const value = this.getDataValue('skills');
-        return value ? JSON.parse(value) : [];
-      },
-      set(value) {
-        this.setDataValue('skills', JSON.stringify(value));
-      }
-    },
-    reqDescription: {
+    note: {
       type: DataTypes.STRING,
       allowNull: false
     },

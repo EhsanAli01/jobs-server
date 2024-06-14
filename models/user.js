@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       })
       user.hasMany(models.jobRequest, {
         foreignKey: 'userId',
-        as: 'jobRequest'
+        as: 'jobRequests'
       })
     }
   }
@@ -44,6 +44,32 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    experience: {
+      type: DataTypes.STRING,
+    },
+    education: {
+      type: DataTypes.STRING,
+    },
+    languages: {
+      type: DataTypes.TEXT,
+      get() {
+        const value = this.getDataValue('languages');
+        return value ? JSON.parse(value) : [];
+      },
+      set(value) {
+        this.setDataValue('languages', JSON.stringify(value));
+      }
+    },
+    skills: {
+      type: DataTypes.TEXT,
+      get() {
+        const value = this.getDataValue('skills');
+        return value ? JSON.parse(value) : [];
+      },
+      set(value) {
+        this.setDataValue('skills', JSON.stringify(value));
+      }
     },
     description: DataTypes.STRING,
     image: DataTypes.STRING

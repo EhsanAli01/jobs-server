@@ -24,7 +24,11 @@ const getJob = async (req, res, next) => {
                 },
                 {
                     model: jobRequest,
-                    as: 'jobRequest'
+                    as: 'jobRequest',
+                    include: {
+                        model: user,
+                        as: 'user'
+                    }
                 }
             ]
         });

@@ -9,37 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      experience: {
+      expectedSalary: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      education: {
+      type: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      languages: {
-        type: Sequelize.TEXT,
-        allowNull: false,
-        get() {
-          const value = this.getDataValue('languages');
-          return value ? JSON.parse(value) : [];
-        },
-        set(value) {
-          this.setDataValue('languages', JSON.stringify(value));
-        }
-      },
-      skills: {
-        type: Sequelize.TEXT,
-        allowNull: false,
-        get() {
-          const value = this.getDataValue('skills');
-          return value ? JSON.parse(value) : [];
-        },
-        set(value) {
-          this.setDataValue('skills', JSON.stringify(value));
-        }
-      },
-      reqDescription: {
+      note: {
         type: Sequelize.STRING,
         allowNull: false
       },
