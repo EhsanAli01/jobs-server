@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { user, jobRequest } = require('../models');
+const { user, jobRequest, jobs } = require('../models');
 const jwt = require('jsonwebtoken');
 
 const updateProfileSchema = joi.object({
@@ -18,10 +18,19 @@ const getUser = async (req, res, next) => {
             where: {
                 id: req.params.id
             },
-            include: {
+            include: [{
                 model: jobRequest,
                 as: 'jobRequests'
+            },
+            {
+                model: jobs,
+                as: 'jobs',
+                include: {
+                    model: jobRequest,
+                    as: 'jobRequest'
+                }
             }
+            ]
         })
 
         return res.status(200).json({
