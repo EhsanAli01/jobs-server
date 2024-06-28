@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class jobRequest extends Model {
     /**
@@ -12,45 +10,52 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       jobRequest.belongsTo(models.user, {
-        foreignKey: 'userId',
-        as: 'user'
-      })
+        foreignKey: "userId",
+        as: "user",
+      });
       jobRequest.belongsTo(models.jobs, {
-        foreignKey: 'jobId',
-        as: 'jobs'
-      })
+        foreignKey: "jobId",
+        as: "jobs",
+      });
     }
   }
-  jobRequest.init({
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
+  jobRequest.init(
+    {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+      expectedSalary: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      note: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      jobId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      userId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
-    expectedSalary: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    note: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    jobId: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    userId: {
-      type: DataTypes.STRING,
-      allowNull: false
+    {
+      sequelize,
+      modelName: "jobRequest",
     }
-  }, {
-    sequelize,
-    modelName: 'jobRequest',
-  });
+  );
   return jobRequest;
 };
