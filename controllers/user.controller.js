@@ -95,7 +95,52 @@ const updateUser = async (req, res, next) => {
   }
 };
 
+const updateRating = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const rating = req.body.rating;
+
+    const userData = await user.findOne({
+      where: { id: userId },
+    });
+
+    console.log(userData);
+
+    const reviews = userData.reviews;
+    const newReviews = reviews + 1;
+
+    const oldRating = userData.rating;
+    let newRating;
+
+    if (oldRating === 0) {
+      newRating = rating;
+    } else {
+      newRating = (oldRating + rating) / 2;
+    }
+
+    const result = await user.update(
+      {
+        rating: newRating,
+        reviews: newReviews,
+      },
+      {
+        where: { id: userId },
+      }
+    );
+
+    return res.status(200).json({
+      message: result,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Couldn't update rating.",
+    });
+  }
+};
+
 module.exports = {
   updateUser,
   getUser,
+  updateRating,
 };

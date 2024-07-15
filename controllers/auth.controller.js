@@ -101,7 +101,7 @@ const login = async (req, res, next) => {
     );
     return res.status(200).json({
       message: {
-        result: result,
+        userData: result,
         token: token,
       },
     });
@@ -155,7 +155,7 @@ const register = async (req, res, next) => {
     );
 
     return res.status(200).json({
-      message: result,
+      userData: result,
       token: token,
     });
   } catch (error) {

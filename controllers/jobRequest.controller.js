@@ -1,4 +1,4 @@
-const { jobRequest } = require("../models");
+const { jobRequest, notifications } = require("../models");
 const joi = require("joi");
 
 const jobRequestSchema = joi.object({
@@ -42,32 +42,77 @@ const requestJob = async (req, res, next) => {
 
 const declineRequest = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const result = await jobRequest.destroy({
-      where: {
-        id: id,
-      },
-    });
+    const { reqId, jobId, senderId, receiverId } = req.query;
+    const result = await jobRequest.update(
+      { status: "Declined" },
+      { where: { id: reqId } }
+    );
+
+    if (result) {
+      const declined = await notifications.create({
+        senderId: senderId,
+        receiverId: receiverId,
+        jobId: jobId,
+        action: "declined your proposal for",
+        status: true,
+      });
+    }
 
     return res.status(200).json({
-      message: "Decline success",
+      message: result,
+      declined_notification: "Declined",
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Failed to delete application",
+      message: "Failed to decline application",
     });
   }
 };
 
 const acceptRequest = async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const { reqId, jobId, senderId, receiverId } = req.query;
+
     const result = await jobRequest.update(
       { status: "Accepted" },
+      { where: { id: reqId } }
+    );
+
+    const declineOthers = await jobRequest.update(
+      { status: "Declined" },
+      { where: { status: "Applied", jobId: jobId } }
+    );
+
+    if (result) {
+      const accepted = await notifications.create({
+        senderId: senderId,
+        receiverId: receiverId,
+        jobId: jobId,
+        action: "accepted your proposal for",
+        status: true,
+      });
+    }
+
+    return res.status(200).json({
+      message: result,
+      declined: declineOthers,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to accept application",
+    });
+  }
+};
+
+const completedRequest = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const result = await jobRequest.update(
+      { status: "Completed" },
       { where: { id: id } }
     );
 
-    return res.status(200).json({
+    res.status(200).json({
       message: result,
     });
   } catch (error) {
@@ -81,4 +126,5 @@ module.exports = {
   requestJob,
   declineRequest,
   acceptRequest,
+  completedRequest,
 };

@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         as: "user",
       });
+      jobs.hasOne(models.notifications, {
+        foreignKey: "jobId",
+        as: "notifications",
+      });
     }
   }
   jobs.init(

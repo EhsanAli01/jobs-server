@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         as: "jobRequests",
       });
+      user.hasOne(models.notifications, {
+        foreignKey: "senderId",
+        as: "sender",
+      });
     }
   }
   user.init(
@@ -72,6 +76,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       description: DataTypes.STRING,
       image: DataTypes.STRING,
+      rating: { type: DataTypes.FLOAT, defaultValue: 0 },
+      reviews: { type: DataTypes.INTEGER, defaultValue: 0 },
     },
     {
       sequelize,
