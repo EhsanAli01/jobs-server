@@ -1,6 +1,5 @@
-const { jobs, jobRequest, user } = require("../models");
+const { jobs, jobRequest, user, reviews } = require("../models");
 const joi = require("joi");
-const { Op, where } = require("sequelize");
 
 const jobSchema = joi.object({
   jobTitle: joi.string().min(3).max(30).required(),
@@ -18,6 +17,9 @@ const jobSchema = joi.object({
 const getJob = async (req, res, next) => {
   try {
     const result = await jobs.findAll({
+      where: {
+        expired: false,
+      },
       include: [
         {
           model: user,
@@ -33,6 +35,7 @@ const getJob = async (req, res, next) => {
         },
       ],
     });
+
     res.status(200).json({
       message: result,
     });
@@ -60,8 +63,13 @@ const getJobById = async (req, res, next) => {
             as: "user",
           },
         },
+        {
+          model: reviews,
+          as: "reviews",
+        },
       ],
     });
+
     res.status(200).json({
       message: result,
     });
@@ -82,18 +90,41 @@ const conGetJobByStatus = async (req, res, next) => {
     }
 
     const result = await jobs.findAll({
-      include: {
-        model: jobRequest,
-        where: { status: status },
-        as: "jobRequest",
-        required: true,
-        include: {
-          model: user,
-          as: "user",
-          where: { id: userId },
-          required: true,
-        },
+      where: {
+        expired: false,
       },
+      include: [
+        {
+          model: jobRequest,
+          where: { status: status },
+          as: "jobRequest",
+          required: true,
+          include: {
+            model: user,
+            as: "user",
+            where: { id: userId },
+            required: true,
+          },
+        },
+        {
+          model: reviews,
+          as: "reviews",
+          include: [
+            {
+              model: user,
+              as: "user",
+            },
+            {
+              model: jobs,
+              as: "jobs",
+              include: {
+                model: jobRequest,
+                as: "jobRequest",
+              },
+            },
+          ],
+        },
+      ],
     });
 
     res.status(200).json({
@@ -121,21 +152,42 @@ const getJobByStatus = async (req, res, next) => {
       include: {
         model: jobs,
         as: "jobs",
-        include: {
-          model: jobRequest,
-          as: "jobRequest",
-          where: { status: status },
-          required: true,
-        },
+        include: [
+          {
+            model: jobRequest,
+            as: "jobRequest",
+            where: { status: status },
+            required: true,
+          },
+          {
+            model: reviews,
+            as: "reviews",
+            include: [
+              {
+                model: user,
+                as: "user",
+              },
+              {
+                model: jobs,
+                as: "jobs",
+                include: {
+                  model: jobRequest,
+                  as: "jobRequest",
+                },
+              },
+            ],
+          },
+        ],
       },
     });
 
     res.status(200).json({
-      message: result.jobs,
+      message: result,
     });
   } catch (error) {
     return res.status(500).json({
       message: "Failed to get data",
+      error: error,
     });
   }
 };
@@ -151,13 +203,12 @@ const getJobByUser = async (req, res, next) => {
         include: {
           model: jobRequest,
           as: "jobRequest",
-          required: false,
         },
       },
     });
 
     res.status(200).json({
-      message: result.jobs,
+      message: result,
     });
   } catch (error) {
     console.log(error);
@@ -192,15 +243,54 @@ const createJob = async (req, res, next) => {
 
     const result = await jobs.create(validatedData);
 
-    if (result) {
-      return res.status(201).json({
-        message: result,
-      });
-    }
+    return res.status(201).json({
+      message: result,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       message: "Failed to post job",
+    });
+  }
+};
+
+const createReview = async (req, res, next) => {
+  try {
+    const { userId, jobId } = req.query;
+    const { starCount, message } = req.body;
+
+    const result = await reviews.create({
+      userId,
+      jobId,
+      starCount,
+      message,
+    });
+
+    res.status(200).json({
+      message: result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to post review",
+    });
+  }
+};
+
+const deleteJob = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const result = await jobs.destroy({
+      where: { id },
+    });
+
+    res.status(200).json({
+      message: "Job deleted successfully",
+      result: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error,
     });
   }
 };
@@ -212,4 +302,6 @@ module.exports = {
   getJobByStatus,
   getJobByUser,
   conGetJobByStatus,
+  createReview,
+  deleteJob,
 };

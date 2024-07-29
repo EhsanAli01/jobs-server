@@ -28,10 +28,6 @@ const getUser = async (req, res, next) => {
       },
       include: [
         {
-          model: jobRequest,
-          as: "jobRequests",
-        },
-        {
           model: jobs,
           as: "jobs",
           include: {
@@ -95,52 +91,30 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-const updateRating = async (req, res, next) => {
+const deleteUser = async (req, res, next) => {
   try {
-    const userId = req.params.id;
-    const rating = req.body.rating;
-
-    const userData = await user.findOne({
-      where: { id: userId },
-    });
-
-    console.log(userData);
-
-    const reviews = userData.reviews;
-    const newReviews = reviews + 1;
-
-    const oldRating = userData.rating;
-    let newRating;
-
-    if (oldRating === 0) {
-      newRating = rating;
-    } else {
-      newRating = (oldRating + rating) / 2;
+    const token = req.headers.authorization.split(" ")[1];
+    if (!token) {
+      return res.status(500).json({
+        message: "Token not found",
+      });
     }
 
-    const result = await user.update(
-      {
-        rating: newRating,
-        reviews: newReviews,
-      },
-      {
-        where: { id: userId },
-      }
-    );
+    const userData = jwt.decode(token);
+    const result = await user.destroy({
+      where: { id: userData.id },
+    });
 
     return res.status(200).json({
       message: result,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Couldn't update rating.",
-    });
+    return res.status(500).json({ message: error });
   }
 };
 
 module.exports = {
   updateUser,
   getUser,
-  updateRating,
+  deleteUser,
 };

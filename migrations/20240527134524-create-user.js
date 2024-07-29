@@ -58,13 +58,14 @@ module.exports = {
       image: {
         type: Sequelize.STRING,
       },
-      rating: {
-        type: Sequelize.FLOAT,
-        defaultValue: 0,
+      otp: {
+        type: Sequelize.STRING,
       },
-      reviews: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
+      timestamp: {
+        type: Sequelize.DATE,
+      },
+      status: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

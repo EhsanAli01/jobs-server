@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "jobId",
         as: "notifications",
       });
+      jobs.hasMany(models.reviews, {
+        foreignKey: "jobId",
+        as: "reviews",
+      });
     }
   }
   jobs.init(
@@ -73,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
       endTime: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      expired: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       userId: {
         type: DataTypes.STRING,

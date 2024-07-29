@@ -46,7 +46,11 @@ const markSeen = async (req, res, next) => {
       );
     }
 
-    await transaction.commit();
+    const result = await transaction.commit();
+
+    res.status(200).json({
+      message: result,
+    });
   } catch (error) {
     await transaction.rollback();
     console.error("Failed to update records:", error);
@@ -57,7 +61,7 @@ const markAsRead = async (req, res, next) => {
   try {
     const notificationId = req.params.id;
     const result = await notifications.update(
-      { status: false },
+      { read: true },
       { where: { id: notificationId } }
     );
     res.status(200).json({
@@ -74,7 +78,7 @@ const markAllAsRead = async (req, res, next) => {
   try {
     const receiverId = req.params.id;
     const result = await notifications.update(
-      { status: false },
+      { read: true },
       { where: { receiverId } }
     );
     res.status(200).json({

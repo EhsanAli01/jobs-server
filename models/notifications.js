@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      senderId: { type: DataTypes.STRING, allowNull: false },
+      senderId: { type: DataTypes.STRING },
       receiverId: { type: DataTypes.STRING, allowNull: false },
       jobId: { type: DataTypes.STRING, allowNull: false },
       action: { type: DataTypes.STRING, allowNull: false },
-      status: { type: DataTypes.BOOLEAN, defaultValue: true, allowNull: false },
+      read: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
       seen: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     },
     {

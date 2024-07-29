@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "senderId",
         as: "sender",
       });
+      user.hasOne(models.reviews, {
+        foreignKey: "userId",
+        as: "user",
+      });
     }
   }
   user.init(
@@ -74,10 +78,11 @@ module.exports = (sequelize, DataTypes) => {
           this.setDataValue("skills", JSON.stringify(value));
         },
       },
+      otp: DataTypes.STRING,
+      timestamp: DataTypes.DATE,
+      status: DataTypes.STRING,
       description: DataTypes.STRING,
       image: DataTypes.STRING,
-      rating: { type: DataTypes.FLOAT, defaultValue: 0 },
-      reviews: { type: DataTypes.INTEGER, defaultValue: 0 },
     },
     {
       sequelize,

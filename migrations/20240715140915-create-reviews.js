@@ -2,14 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("notifications", {
+    await queryInterface.createTable("reviews", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      senderId: {
+      starCount: {
+        type: Sequelize.INTEGER,
+      },
+      message: {
+        type: Sequelize.STRING,
+      },
+      jobId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "jobs",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      userId: {
         type: Sequelize.INTEGER,
         references: {
           model: "users",
@@ -18,45 +33,19 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
-      receiverId: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      jobId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: "jobs",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-      action: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      read: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      seen: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("notifications");
+    await queryInterface.dropTable("reviews");
   },
 };

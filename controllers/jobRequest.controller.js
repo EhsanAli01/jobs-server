@@ -1,5 +1,6 @@
-const { jobRequest, notifications } = require("../models");
+const { jobRequest } = require("../models");
 const joi = require("joi");
+const { newNotification } = require("../util/notificationsHandler");
 
 const jobRequestSchema = joi.object({
   expectedSalary: joi.number().min(1).required(),
@@ -49,13 +50,12 @@ const declineRequest = async (req, res, next) => {
     );
 
     if (result) {
-      const declined = await notifications.create({
-        senderId: senderId,
-        receiverId: receiverId,
-        jobId: jobId,
-        action: "declined your proposal for",
-        status: true,
-      });
+      newNotification(
+        senderId,
+        "declined your proposal for",
+        jobId,
+        receiverId
+      );
     }
 
     return res.status(200).json({
@@ -84,13 +84,12 @@ const acceptRequest = async (req, res, next) => {
     );
 
     if (result) {
-      const accepted = await notifications.create({
-        senderId: senderId,
-        receiverId: receiverId,
-        jobId: jobId,
-        action: "accepted your proposal for",
-        status: true,
-      });
+      newNotification(
+        senderId,
+        "accepted your proposal for",
+        jobId,
+        receiverId
+      );
     }
 
     return res.status(200).json({
@@ -105,19 +104,72 @@ const acceptRequest = async (req, res, next) => {
 };
 
 const completedRequest = async (req, res, next) => {
+  const { reqId, jobId, senderId, receiverId } = req.query;
   try {
-    const id = req.params.id;
     const result = await jobRequest.update(
       { status: "Completed" },
-      { where: { id: id } }
+      { where: { id: reqId } }
     );
+
+    if (result) {
+      newNotification(
+        senderId,
+        "Marked your project as completed",
+        jobId,
+        receiverId
+      );
+    }
 
     res.status(200).json({
       message: result,
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Failed to accept application",
+      message: "Failed to mark complete",
+    });
+  }
+};
+
+const cancelRequest = async (req, res, next) => {
+  const { reqId, jobId, senderId, receiverId } = req.query;
+  try {
+    const result = await jobRequest.update(
+      { status: "Cancelled" },
+      { where: { id: reqId } }
+    );
+
+    if (result) {
+      newNotification(senderId, "Cancelled your project", jobId, receiverId);
+    }
+
+    res.status(200).json({
+      message: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to cancel application",
+    });
+  }
+};
+
+const applyCompleted = async (req, res, next) => {
+  const { reqId, jobId, senderId, receiverId } = req.query;
+  try {
+    const result = await jobRequest.update(
+      { status: "Applied-For-Completion" },
+      { where: { id: reqId } }
+    );
+
+    if (result) {
+      newNotification(senderId, "Applied for completion", jobId, receiverId);
+    }
+
+    res.status(200).json({
+      message: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to apply for completion",
     });
   }
 };
@@ -127,4 +179,6 @@ module.exports = {
   declineRequest,
   acceptRequest,
   completedRequest,
+  cancelRequest,
+  applyCompleted,
 };
