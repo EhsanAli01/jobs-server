@@ -5,7 +5,6 @@ const user = require("./routes/user.routes.js");
 const auth = require("./routes/auth.router.js");
 const cors = require("cors");
 const { loginAuth } = require("./middlewares/auth.middleware.js");
-const sendMails = require("./util/sendMails.js");
 
 app.use(express.json());
 app.use(cors());
@@ -20,7 +19,5 @@ app.use("*", (req, res, next) => {
     message: "Page not found",
   });
 });
-
-// sendMails("aaraf08nov@gmail.com");
 
 module.exports = app;
